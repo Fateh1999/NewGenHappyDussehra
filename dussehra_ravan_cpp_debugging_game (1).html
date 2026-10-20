@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NewGen Academy | Dussehra C++ Debugging Game</title>
+<style>
+:root{--gold:#ffd875;--gold2:#b66b1b;--fire:#ff681e;--red:#8e171c;--ink:#09070c;--panel:#171019;--muted:#c7b8a0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:#fff4d7;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(ellipse at 50% 23%,#4d171b 0,#241018 38%,#0b080d 75%,#050407 100%);overflow-x:hidden}
+button,textarea{font:inherit}
+button{cursor:pointer}
+.page{max-width:1440px;margin:auto;padding:22px 18px 40px;position:relative}
+.top{text-align:center;margin:0 auto 14px}
+.brand-banner{display:inline-flex;align-items:center;gap:12px;margin:0 auto 13px;padding:9px 20px 9px 10px;border:1px solid #ffd875aa;border-radius:16px;background:linear-gradient(115deg,#38121b,#171018 75%);box-shadow:0 0 0 3px #ffd87512,0 0 30px #ff781e2b, inset 0 1px #fff3bd30;text-align:left}
+.brand-mark{display:grid;place-items:center;width:48px;height:48px;border-radius:12px;background:linear-gradient(145deg,#fff0a8,#f3a32d 58%,#b9471c);color:#35120b;font:bold 1.05rem Georgia,serif;border:1px solid #fff0a0;box-shadow:0 3px 14px #f67b2e44}
+.brand-name{display:block;color:#ffe49c;font:700 clamp(1.1rem,2.7vw,1.55rem) Georgia,serif;letter-spacing:.035em;text-shadow:0 0 15px #ff9b3550}
+.brand-tagline{display:block;margin-top:3px;color:#eabf78;font-size:.58rem;letter-spacing:.19em;font-weight:800}
+.kicker{font-size:.72rem;letter-spacing:.32em;color:#f8b84e;text-transform:uppercase}
+h1{margin:8px 0 6px;font-family:Georgia,serif;font-size:clamp(2rem,5vw,4.4rem);line-height:1;color:#ffe5a0;text-shadow:0 0 26px #f85d1d48}
+h1 span{color:#ff8a35}
+.intro{margin:0 auto;color:#dfc9a6;max-width:720px;font-size:clamp(.9rem,1.7vw,1.05rem)}
+.stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:18px 0 8px}
+.stat{border:1px solid #b879364c;background:#170d12bb;border-radius:999px;padding:8px 14px;font-size:.84rem;color:#e8d7b8}
+.stat strong{color:#ffd66f}
+.progress{height:5px;max-width:420px;margin:12px auto 0;background:#ffffff14;border-radius:99px;overflow:hidden}
+.progress span{display:block;width:0;height:100%;background:linear-gradient(90deg,#ff501c,#ffd46a);transition:width .4s}
+.scene{width:100%;max-width:1100px;margin:0 auto;position:relative;isolation:isolate}
+.aura{position:absolute;left:10%;right:10%;top:2%;height:58%;background:radial-gradient(ellipse,#d85b1c20,transparent 70%);pointer-events:none;z-index:-1}
+.ravan-svg{width:80vw;max-width:900px;height:auto;display:block;margin:0 auto;overflow:visible;filter:drop-shadow(0 16px 18px #0008)}
+.head{cursor:pointer;transform-box:fill-box;transform-origin:center;transition:filter .2s,opacity .35s}
+.head:hover:not(.burned){filter:brightness(1.22) drop-shadow(0 0 13px #ff751c)}
+.head:hover:not(.burned) .brow{transform-box:fill-box;transform-origin:center;transform:translateY(-2px) scaleY(1.8);stroke:#4b090b;stroke-width:5.5}
+.head:hover:not(.burned) .pupil{fill:#f21f17;filter:drop-shadow(0 0 3px #ff210c)}
+.head:hover:not(.burned) .mouth{transform-box:fill-box;transform-origin:center;transform:translateY(-1px) scaleY(.62);fill:#090508;stroke:#ff5a2a;stroke-width:2.4}
+.flame-burst{pointer-events:none;overflow:visible;animation:flameFlicker .14s infinite alternate;filter:drop-shadow(0 0 7px #ff4a08)}
+.flame-outer{fill:#ff4a0b;stroke:#ffd34d;stroke-width:1.5;stroke-linejoin:round}
+.flame-inner{fill:#ffca39;opacity:.95}
+@keyframes flameFlicker{from{opacity:.82;transform-origin:center;filter:drop-shadow(0 0 5px #ff4a08)}to{opacity:1;filter:drop-shadow(0 0 13px #ffae19)}}
+.head:focus{outline:none;filter:drop-shadow(0 0 8px #ffe18b)}
+.head.burned{pointer-events:none;opacity:0;transform:scale(0);transition:transform .62s ease-in,opacity .62s ease-in}
+.head.burning{animation:burn .68s ease-in forwards;filter:drop-shadow(0 0 18px #ff4717)}
+.head.laugh{animation:laugh .42s ease-in-out}
+@keyframes burn{0%{transform:scale(1);opacity:1}35%{transform:scale(1.18);filter:brightness(1.8) drop-shadow(0 0 28px #ff3c00)}100%{transform:scale(0);opacity:0}}
+@keyframes laugh{0%,100%{transform:rotate(0)}20%{transform:rotate(-5deg)}40%{transform:rotate(5deg)}60%{transform:rotate(-4deg)}80%{transform:rotate(4deg)}}
+.body-art{pointer-events:none;filter:drop-shadow(0 14px 20px #0009)}
+.head-label{font-size:12px;fill:#f5c86c;text-anchor:middle;letter-spacing:1px;font-weight:700;pointer-events:none}
+.floor-glow{height:24px;max-width:750px;margin:-2px auto 0;border-radius:50%;background:radial-gradient(ellipse,#fa642d36,transparent 70%)}
+.help{text-align:center;color:#d0bda0;font-size:.88rem;margin:8px 0 0}
+.help b{color:#ffd875}
+.foot{text-align:center;margin-top:26px;color:#a8977e;font-size:.78rem;letter-spacing:.06em}
+.foot strong{color:#ffe08b;font-weight:900;text-shadow:0 0 12px #ff8a353d}
+.bg-music-toggle{position:fixed;bottom:20px;right:20px;background:linear-gradient(135deg,#ffd875,#f18b2b);color:#2a1007;border:0;border-radius:50%;width:50px;height:50px;cursor:pointer;font-size:1.4rem;box-shadow:0 4px 15px #f56b2526;z-index:10;transition:transform .15s,filter .15s}.bg-music-toggle:hover{filter:brightness(1.12);transform:scale(1.05)}
+.overlay{position:fixed;inset:0;background:#050307d9;backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
+.overlay.show{display:flex}
+.modal{width:min(760px,100%);max-height:92vh;overflow:auto;background:linear-gradient(145deg,#26141a,#100c13 72%);border:1px solid #d69a464f;border-radius:22px;box-shadow:0 22px 90px #000b,0 0 35px #ff6b1d12;padding:clamp(18px,4vw,30px);position:relative}
+.close{position:absolute;right:14px;top:12px;border:1px solid #f2ca7840;background:#ffffff08;color:#f4dca7;width:38px;height:38px;border-radius:50%;font-size:1.2rem}
+.modal-kicker{color:#f6b74f;text-transform:uppercase;letter-spacing:.2em;font-size:.7rem;font-weight:700}
+.modal h2{font:clamp(1.5rem,4vw,2.3rem) Georgia,serif;color:#ffe3a0;margin:8px 42px 8px 0}
+.desc{color:#d8c4a5;line-height:1.5;margin:0 0 14px}
+.codebox{background:#090b10;border:1px solid #4b382a;border-radius:12px;overflow:hidden;margin:14px 0}
+.codebar{display:flex;align-items:center;gap:7px;padding:10px 13px;background:#17171c;border-bottom:1px solid #3c3027;color:#b8a58b;font-size:.76rem}
+.dot{width:8px;height:8px;border-radius:50%;background:#ff6557}.dot:nth-child(2){background:#ffca58}.dot:nth-child(3){background:#63c76a}
+textarea{display:block;width:100%;min-height:230px;resize:vertical;background:#090b10;color:#d9f4d3;border:0;outline:none;padding:16px;font: .9rem/1.6 "SFMono-Regular",Consolas,monospace;tab-size:4}
+.modal-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.btn{border:0;border-radius:10px;padding:11px 17px;font-weight:750;transition:transform .15s,filter .15s}
+.btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.primary{background:linear-gradient(135deg,#ffd875,#f18b2b);color:#2a1007;box-shadow:0 6px 20px #f56b2526}
+.secondary{background:#ffffff0c;color:#f1dcb4;border:1px solid #f5d28a36}
+.feedback{margin-top:14px;padding:12px 14px;border-radius:10px;display:none;line-height:1.45;font-size:.9rem}
+.feedback.show{display:block}.feedback.good{background:#183322;border:1px solid #4a9c63;color:#c9f5d4}.feedback.bad{background:#3b1919;border:1px solid #a74c37;color:#ffd3ba}.hint{margin-top:9px;color:#e8bc6b;font-size:.87rem}
+.victory{text-align:center;padding:22px 8px 12px;overflow:hidden}
+.victory h2{font-size:clamp(2.4rem,8vw,4.5rem);margin:12px 0;color:#ffe49c;text-shadow:0 0 30px #ff6b1d77}
+.victory p{color:#e6caa0}
+.brand{font:1.2rem Georgia,serif;color:#ffbd52!important;letter-spacing:.08em}
+.firework{position:absolute;width:100px;height:100px;top:5%;left:4%;pointer-events:none;animation:pop 2s infinite}
+.firework.two{left:auto;right:3%;top:16%;animation-delay:.6s}.firework.three{top:auto;bottom:8%;left:12%;animation-delay:1.1s}
+@keyframes pop{0%{transform:scale(.2) rotate(0);opacity:0}35%{opacity:1}100%{transform:scale(1.2) rotate(40deg);opacity:0}}
+.sparkle{fill:#ffdb72;filter:drop-shadow(0 0 5px #ff9d34)}
+.confetti{position:fixed;top:-20px;width:8px;height:14px;z-index:30;pointer-events:none;animation:fall 3.8s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(760deg);opacity:0}}
+.ravan-svg.all-burning{animation:wholeBurn .95s ease-in forwards;transform-origin:center}
+@keyframes wholeBurn{0%{filter:brightness(1)}30%{filter:brightness(2.2) sepia(.4) drop-shadow(0 0 35px #ff4b12);transform:scale(1.03)}100%{filter:brightness(3) sepia(1);opacity:0;transform:scale(.86)}}
+@media(max-width:600px){.page{padding:18px 6px 28px}.ravan-svg{width:96vw}.stats{gap:6px}.stat{padding:7px 10px;font-size:.76rem}.help{padding:0 12px}.modal{border-radius:16px}textarea{min-height:200px;font-size:.82rem}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="top">
+    <div class="brand-banner" aria-label="NewGen Academy">
+      <span class="brand-mark" aria-hidden="true">NG</span>
+      <span><span class="brand-name">NewGen Academy</span><span class="brand-tagline">CODE · CREATE · CONQUER</span></span>
+    </div>
+    <div class="kicker">Presents a Dussehra Special</div>
+    <h1>Code the <span>Victory.</span></h1>
+    <p class="intro">Ten heads. Ten C++ bugs. Fix the code to defeat Lankesh and light the Dussehra sky.</p>
+    <div class="stats">
+      <div class="stat">Heads burned: <strong id="burnCount">0</strong>/10</div>
+      <div class="stat">Challenges solved: <strong id="solveCount">0</strong></div>
+      <div class="stat">Tap any head to debug</div>
+    </div>
+    <div class="progress"><span id="progressFill"></span></div>
+  </header>
+
+  <section class="scene" aria-label="Ravan game board">
+    <div class="aura"></div>
+    <svg class="ravan-svg" id="ravan" viewBox="0 0 1000 610" role="img" aria-label="Ten crowned Ravan heads above a royal body">
+      <defs>
+        <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff4b6"/><stop offset=".22" stop-color="#e8b23f"/><stop offset=".48" stop-color="#fff0a0"/><stop offset=".72" stop-color="#a95d17"/><stop offset="1" stop-color="#ffe7a0"/></linearGradient>
+        <linearGradient id="skin" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="#ffdc9b"/><stop offset=".38" stop-color="#d99a61"/><stop offset=".72" stop-color="#a95b3b"/><stop offset="1" stop-color="#612b25"/></linearGradient>
+        <linearGradient id="red" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fa6043"/><stop offset="1" stop-color="#650b1a"/></linearGradient>
+        <radialGradient id="jewel"><stop stop-color="#ffb9a1"/><stop offset=".4" stop-color="#e52d35"/><stop offset="1" stop-color="#590713"/></radialGradient>
+        <linearGradient id="armor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7c1720"/><stop offset=".5" stop-color="#310d18"/><stop offset="1" stop-color="#a52b24"/></linearGradient>
+        <g id="smallHead">
+          <path d="M-36 26 Q-53 3 -40 -23 Q-25 -43 0 -40 Q25 -43 40 -23 Q53 3 36 26 L28 45 L-28 45Z" fill="#211015" stroke="#08070b" stroke-width="3"/>
+          <path d="M-28 -8 L-34 -39 L-15 -28 L0 -59 L15 -28 L34 -39 L28 -8Z" fill="url(#gold)" stroke="#77410e" stroke-width="2.4" stroke-linejoin="round"/>
+          <path d="M-22 -12 L-25 -31 L-11 -23 L0 -47 L11 -23 L25 -31 L22 -12Z" fill="url(#red)" stroke="#ffdf85" stroke-width="1.2"/>
+          <path d="M-34 -7 Q0 3 34 -7 L31 2 Q0 13 -31 2Z" fill="url(#gold)" stroke="#78400f" stroke-width="1.5"/>
+          <circle cx="0" cy="-28" r="5.4" fill="url(#jewel)" stroke="#ffe49b" stroke-width="1.2"/>
+          <path d="M-30 -3 Q-37 9 -32 25 L-25 34 M30 -3 Q37 9 32 25 L25 34" fill="none" stroke="#f7c75e" stroke-width="2"/>
+          <path d="M-27 3 Q-29 19 -23 34 Q0 51 23 34 Q29 19 27 3 Q0 -7 -27 3Z" fill="url(#skin)" stroke="#54221c" stroke-width="2"/>
+          <path d="M-25 13 Q-14 4 -4 13 Q-14 21 -25 13Z M4 13 Q14 4 25 13 Q14 21 4 13Z" fill="#fff1cb" stroke="#2c0e11" stroke-width="1.8"/>
+          <circle class="pupil" cx="-14" cy="13" r="3.2" fill="#160a0b"/><circle class="pupil" cx="14" cy="13" r="3.2" fill="#160a0b"/>
+          <path class="brow" d="M-28 5 L-7 8 M7 8 L28 5" fill="none" stroke="#2a0e11" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M0 13 L-4 26 L3 28" fill="none" stroke="#713222" stroke-width="2.3" stroke-linecap="round"/>
+          <path class="mouth" d="M-25 29 Q-12 35 0 29 Q12 35 25 29 Q21 45 0 52 Q-21 45 -25 29Z" fill="#1b0e12" stroke="#5d251c" stroke-width="1.8"/>
+          <path d="M-24 29 Q-40 17 -43 31 Q-39 44 -19 39 Q0 33 0 30 Q0 33 19 39 Q39 44 43 31 Q40 17 24 29 Q12 26 0 31 Q-12 26 -24 29Z" fill="#1a0b0e" stroke="#4d201b" stroke-width="1.4"/>
+          <path d="M-13 37 Q0 41 13 37" fill="none" stroke="#e3a354" stroke-width="1.4"/>
+          <path d="M-29 15 Q-36 13 -34 24 L-27 29 M29 15 Q36 13 34 24 L27 29" fill="none" stroke="#f7cf6b" stroke-width="2.5"/>
+          <circle cx="-30" cy="27" r="4.5" fill="url(#jewel)" stroke="#ffdf84" stroke-width="1.3"/><circle cx="30" cy="27" r="4.5" fill="url(#jewel)" stroke="#ffdf84" stroke-width="1.3"/>
+          <path d="M-15 1 Q0 -3 15 1" fill="none" stroke="#f8d67c" stroke-width="1.4"/>
+        </g>
+      </defs>
+      <!-- Static torso, arms, hands and royal chest armour -->
+      <g class="body-art" transform="translate(0 -28)">
+        <ellipse cx="500" cy="580" rx="355" ry="20" fill="#e85d2518"/>
+        <path d="M385 346 Q335 360 286 396 L220 480 Q205 498 223 512 Q239 522 255 501 L325 445 L370 430Z" fill="url(#skin)" stroke="#54211b" stroke-width="4"/>
+        <path d="M615 346 Q665 360 714 396 L780 480 Q795 498 777 512 Q761 522 745 501 L675 445 L630 430Z" fill="url(#skin)" stroke="#54211b" stroke-width="4"/>
+        <path d="M214 493 Q196 486 188 504 L198 526 Q214 537 231 518Z M786 493 Q804 486 812 504 L802 526 Q786 537 769 518Z" fill="url(#gold)" stroke="#74400f" stroke-width="3"/>
+        <path d="M384 330 Q350 357 348 405 L330 520 Q500 572 670 520 L652 405 Q650 357 616 330 L574 349 Q500 378 426 349Z" fill="url(#armor)" stroke="#b87524" stroke-width="4"/>
+        <path d="M391 352 Q500 414 609 352 L632 402 Q500 467 368 402Z" fill="url(#gold)" stroke="#75410e" stroke-width="3"/>
+        <path d="M378 422 Q500 482 622 422 L610 493 Q500 538 390 493Z" fill="#4a1019" stroke="#e8b950" stroke-width="3"/>
+        <path d="M405 434 Q500 481 595 434 M400 461 Q500 511 600 461" fill="none" stroke="#ffe49a" stroke-width="2"/>
+        <path d="M500 398 L522 425 L500 455 L478 425Z" fill="url(#jewel)" stroke="#ffe49a" stroke-width="3"/>
+        <circle cx="500" cy="425" r="7" fill="#fff1a9"/>
+        <g fill="url(#gold)" stroke="#74400f" stroke-width="2">
+          <circle cx="433" cy="407" r="9"/><circle cx="462" cy="421" r="7"/><circle cx="567" cy="421" r="7"/><circle cx="596" cy="407" r="9"/>
+          <path d="M370 377 L386 386 L370 397 L354 386Z"/><path d="M630 377 L646 386 L630 397 L614 386Z"/>
+        </g>
+        <path d="M419 346 Q500 379 581 346" fill="none" stroke="#ffdd7a" stroke-width="5"/>
+      </g>
+      <!-- Ten individually clickable heads -->
+      <g class="head" data-head="0" tabindex="0" role="button" aria-label="Debug challenge 1: Assignment versus comparison">
+        <use href="#smallHead" transform="translate(70 153) scale(1.18)"/><text class="head-label" x="70" y="224">01</text>
+      </g>
+      <g class="head" data-head="1" tabindex="0" role="button" aria-label="Debug challenge 2: Array bounds">
+        <use href="#smallHead" transform="translate(165 137) scale(1.25)"/><text class="head-label" x="165" y="218">02</text>
+      </g>
+      <g class="head" data-head="2" tabindex="0" role="button" aria-label="Debug challenge 3: Wrong variable name">
+        <use href="#smallHead" transform="translate(260 125) scale(1.3)"/><text class="head-label" x="260" y="210">03</text>
+      </g>
+      <g class="head" data-head="3" tabindex="0" role="button" aria-label="Debug challenge 4: Pass by reference">
+        <use href="#smallHead" transform="translate(355 116) scale(1.34)"/><text class="head-label" x="355" y="204">04</text>
+      </g>
+      <g class="head" data-head="4" tabindex="0" role="button" aria-label="Debug challenge 5: String buffer overflow">
+        <use href="#smallHead" transform="translate(450 111) scale(1.36)"/><text class="head-label" x="450" y="200">05</text>
+      </g>
+      <g class="head" data-head="5" tabindex="0" role="button" aria-label="Debug challenge 6: Missing semicolon">
+        <use href="#smallHead" transform="translate(550 111) scale(1.36)"/><text class="head-label" x="550" y="200">06</text>
+      </g>
+      <g class="head" data-head="6" tabindex="0" role="button" aria-label="Debug challenge 7: Uninitialized variable">
+        <use href="#smallHead" transform="translate(645 116) scale(1.34)"/><text class="head-label" x="645" y="204">07</text>
+      </g>
+      <g class="head" data-head="7" tabindex="0" role="button" aria-label="Debug challenge 8: Wrong math operator">
+        <use href="#smallHead" transform="translate(740 125) scale(1.3)"/><text class="head-label" x="740" y="210">08</text>
+      </g>
+      <g class="head" data-head="8" tabindex="0" role="button" aria-label="Debug challenge 9: Loop skips first item">
+        <use href="#smallHead" transform="translate(835 137) scale(1.25)"/><text class="head-label" x="835" y="218">09</text>
+      </g>
+      <g class="head" data-head="9" tabindex="0" role="button" aria-label="Debug challenge 10: Wrong variable type">
+        <use href="#smallHead" transform="translate(930 153) scale(1.18)"/><text class="head-label" x="930" y="224">10</text>
+      </g>
+    </svg>
+    <div class="floor-glow"></div>
+    <p class="help">Choose a head, repair the C++ code, then <b>burn the bug away.</b></p>
+  </section>
+  <footer class="foot">Built with <strong>logic, courage & C++</strong> · Happy Dussehra from NewGen Academy</footer>
+</main>
+
+<audio id="bgMusic" loop>
+  <source src="ravanbg.mp3" type="audio/mpeg">
+</audio>
+<button class="bg-music-toggle" id="musicToggle" aria-label="Toggle background music">🔊</button>
+
+<!-- Head audio files -->
+<audio id="headAudio1" src="h1.mp3"></audio>
+<audio id="headAudio2" src="h2.mp3"></audio>
+<audio id="headAudio3" src="h3.mp3"></audio>
+<audio id="headAudio4" src="h4.mp3"></audio>
+<audio id="headAudio5" src="h5.mp3"></audio>
+<audio id="headAudio6" src="h6.mp3"></audio>
+<audio id="headAudio7" src="h7.mp3"></audio>
+<audio id="headAudio8" src="h8.mp3"></audio>
+<audio id="headAudio9" src="h9.mp3"></audio>
+<audio id="headAudio10" src="h10.mp3"></audio>
+
+<!-- Effect audio files -->
+<audio id="fireSound" src="firesound.mp3"></audio>
+<audio id="ravanLaugh" src="ravanlaugh.mp3"></audio>
+
+<div class="overlay" id="challengeOverlay" role="dialog" aria-modal="true" aria-labelledby="challengeTitle">
+  <section class="modal">
+    <button class="close" id="closeModal" aria-label="Close challenge">×</button>
+    <div class="modal-kicker" id="challengeNumber">Head 01 / 10</div>
+    <h2 id="challengeTitle">Find the bug</h2>
+    <p class="desc" id="challengeDesc"></p>
+    <div class="codebox">
+      <div class="codebar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:7px">main.cpp · editable code</span></div>
+      <textarea id="codeEditor" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Edit C++ code"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn primary" id="submitFix">Compile &amp; test fix</button>
+      <button class="btn secondary" id="showHint">Show hint</button>
+      <button class="btn secondary" id="resetCode">Reset code</button>
+    </div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+    <div class="hint" id="hint" hidden></div>
+    <div id="audioHelp" hidden style="margin-top:16px;padding:14px;border:1px solid #b8793666;border-radius:12px;background:#100b10">
+      <strong style="color:#ffd875">Need help? Here is your audio clue.</strong>
+      <p style="margin:6px 0 12px;color:#d8c4a5;font-size:.88rem">You've had a few attempts. Listen to the audio, then give the bug another try.</p>
+      <div id="audioPlayer" style="width:100%;display:flex;justify-content:center"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+        <button class="btn secondary" type="button" id="replayAudio">Play audio again</button>
+        <a class="btn secondary" href="https://youtu.be/G5l3SAUvhz8" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Open on YouTube</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="victoryOverlay" role="dialog" aria-modal="true" aria-labelledby="victoryTitle">
+  <section class="modal victory">
+    <svg class="firework" viewBox="0 0 100 100" aria-hidden="true"><g stroke="#ffbd4a" stroke-width="3" stroke-linecap="round"><path d="M50 9V27M50 73V91M9 50H27M73 50H91M21 21L34 34M66 66L79 79M79 21L66 34M34 66L21 79"/></g><circle cx="50" cy="50" r="8" class="sparkle"/></svg>
+    <svg class="firework two" viewBox="0 0 100 100" aria-hidden="true"><g stroke="#ff5d2d" stroke-width="3" stroke-linecap="round"><path d="M50 9V27M50 73V91M9 50H27M73 50H91M21 21L34 34M66 66L79 79M79 21L66 34M34 66L21 79"/></g><circle cx="50" cy="50" r="8" fill="#ffe18a"/></svg>
+    <svg class="firework three" viewBox="0 0 100 100" aria-hidden="true"><g stroke="#ffdf81" stroke-width="3" stroke-linecap="round"><path d="M50 9V27M50 73V91M9 50H27M73 50H91M21 21L34 34M66 66L79 79M79 21L66 34M34 66L21 79"/></g><circle cx="50" cy="50" r="8" fill="#ff7a2f"/></svg>
+    <div class="modal-kicker">All ten bugs defeated</div>
+    <h2 id="victoryTitle">Happy Dussehra!</h2>
+    <p>You brought the light of knowledge to Lanka. Every bug fixed, every head conquered.</p>
+    <p class="brand">From NewGen Academy</p>
+    <button class="btn primary" id="playAgain">Play Again</button>
+  </section>
+</div>
+
+<script>
+(() => {
+  const challenges = [
+    {title:"Assignment ≠ comparison",topic:"The condition is changing the value instead of checking it.",desc:"The program should print “Access granted” only when pin is 4321. Fix the condition.",code:`#include <iostream>\nusing namespace std;\nint main() {\n    int pin = 1234;\n    if (pin = 4321) {\n        cout << "Access granted";\n    } else {\n        cout << "Try again";\n    }\n    return 0;\n}`,hint:"Inside an if condition, use the equality comparison operator, not assignment.",solution:`#include <iostream>\nusing namespace std;\nint main() {\n    int pin = 1234;\n    if (pin == 4321) {\n        cout << "Access granted";\n    } else {\n        cout << "Try again";\n    }\n    return 0;\n}`},
+    {title:"Array bounds",topic:"An array of 5 elements has valid indices 0 through 4.",desc:"Print all five elements without accessing memory outside the array.",code:`#include <iostream>\nusing namespace std;\nint main() {\n    int marks[5] = {70, 80, 90, 85, 95};\n    for (int i = 0; i <= 5; i++) {\n        cout << marks[i] << " ";\n    }\n    return 0;\n}`,hint:"The last valid index is one less than the array's size.",solution:`#include <iostream>\nusing namespace std;\nint main() {\n    int marks[5] = {70, 80, 90, 85, 95};\n    for (int i = 0; i < 5; i++) {\n        cout << marks[i] << " ";\n    }\n    return 0;\n}`},
+    {title:"Wrong variable name",topic:"C++ variable names must match exactly, including spelling.",desc:"The program should print the student's score. Fix the misspelled variable name in the output line.",code:`#include <iostream>\nusing namespace std;\nint main() {\n    int score = 100;\n    cout << scrore;\n    return 0;\n}`,hint:"Compare the name used in cout with the variable declared above it.",solution:`#include <iostream>\nusing namespace std;\nint main() {\n    int score = 100;\n    cout << score;\n    return 0;\n}`},
+    {title:"Pass by value vs reference",topic:"A function receiving a copy cannot change the caller's variable.",desc:"Make increase() add 1 to the original variable, not a local copy.",code:`#include <iostream>\nusing namespace std;\nvoid increase(int n) {\n    n++;\n}\nint main() {\n    int count = 4;\n    increase(count);\n    cout << count;\n    return 0;\n}`,hint:"Use a reference parameter by adding & to the parameter type.",solution:`#include <iostream>\nusing namespace std;\nvoid increase(int& n) {\n    n++;\n}\nint main() {\n    int count = 4;\n    increase(count);\n    cout << count;\n    return 0;\n}`},
+    {title:"String buffer size",topic:"A C-style string needs room for its terminating '\\0'.",desc:"Make the character array large enough to hold the word \"RAVAN\" including its terminator.",code:`#include <iostream>\n#include <cstring>\nusing namespace std;\nint main() {\n    char name[5];\n    strcpy(name, "RAVAN");\n    cout << name;\n    return 0;\n}`,hint:"Five visible letters require six bytes when stored as a null-terminated C string.",solution:`#include <iostream>\n#include <cstring>\nusing namespace std;\nint main() {\n    char name[6];\n    strcpy(name, "RAVAN");\n    cout << name;\n    return 0;\n}`},
+    {title:"Missing semicolon",topic:"C++ statements usually end with a semicolon.",desc:"Fix the syntax error so the program prints the Dussehra greeting.",code:`#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Happy Dussehra!"\n    return 0;\n}`,hint:"Look at the end of the cout statement. What punctuation is missing?",solution:`#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Happy Dussehra!";\n    return 0;\n}`},
+    {title:"Uninitialized variable",topic:"Reading a local variable before assigning a value is undefined behavior.",desc:"Initialize total before adding the score to it.",code:`#include <iostream>\nusing namespace std;\nint main() {\n    int total;\n    int score = 80;\n    total = total + score;\n    cout << total;\n    return 0;\n}`,hint:"Give total a known starting value before using it in an expression.",solution:`#include <iostream>\nusing namespace std;\nint main() {\n    int total = 0;\n    int score = 80;\n    total = total + score;\n    cout << total;\n    return 0;\n}`},
+    {title:"Wrong math operator",topic:"The program should calculate the total of two numbers.",desc:"This code is meant to print 7 + 3 = 10. Fix the operator so it calculates the sum.",code:`#include <iostream>\nusing namespace std;\nint main() {\n    int a = 7, b = 3;\n    cout << a - b;\n    return 0;\n}`,hint:"The minus operator subtracts. Which operator adds two numbers?",solution:`#include <iostream>\nusing namespace std;\nint main() {\n    int a = 7, b = 3;\n    cout << a + b;\n    return 0;\n}`},
+    {title:"Loop skips the first item",topic:"Array indices begin at zero in C++.",desc:"Print every item in the array, including the first number, 10.",code:`#include <iostream>\nusing namespace std;\nint main() {\n    int numbers[3] = {10, 20, 30};\n    for (int i = 1; i < 3; i++) {\n        cout << numbers[i] << " ";\n    }\n    return 0;\n}`,hint:"The first element of a C++ array is at index 0, not index 1.",solution:`#include <iostream>\nusing namespace std;\nint main() {\n    int numbers[3] = {10, 20, 30};\n    for (int i = 0; i < 3; i++) {\n        cout << numbers[i] << " ";\n    }\n    return 0;\n}`},
+    {title:"Wrong variable type",topic:"A variable's data type must match the kind of value it stores.",desc:"The variable age should store a whole number. Fix its declaration so the program prints 18.",code:`#include <iostream>\nusing namespace std;\nint main() {\n    string age = 18;\n    cout << age;\n    return 0;\n}`,hint:"age is a whole number, so choose the integer data type and make sure the needed header is included.",solution:`#include <iostream>\nusing namespace std;\nint main() {\n    int age = 18;\n    cout << age;\n    return 0;\n}`}
+  ];
+
+  const heads = [...document.querySelectorAll(".head")];
+  const overlay = document.getElementById("challengeOverlay");
+  const victoryOverlay = document.getElementById("victoryOverlay");
+  const editor = document.getElementById("codeEditor");
+  const feedback = document.getElementById("feedback");
+  const hint = document.getElementById("hint");
+  const ravan = document.getElementById("ravan");
+  let burned = new Set();
+  let current = null;
+  let solved = 0;
+  let locked = false;
+  let wrongAttempts = 0;
+  const audioHelp = document.getElementById("audioHelp");
+  const audioPlayer = document.getElementById("audioPlayer");
+  const audioUrl = "https://www.youtube.com/embed/G5l3SAUvhz8?autoplay=1&playsinline=1&rel=0";
+  function loadHelpAudio() {
+    audioHelp.hidden = false;
+    audioPlayer.innerHTML = `<iframe width="320" height="200" src="${audioUrl}" title="Dussehra audio help" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="max-width:100%;border:0;border-radius:8px"></iframe>`;
+  }
+
+  // Background music toggle
+  const bgMusic = document.getElementById("bgMusic");
+  const musicToggle = document.getElementById("musicToggle");
+  let musicPlaying = true;
+  const originalBgVolume = 1;
+
+  // Try to play music on page load
+  bgMusic.play().catch(e => {
+    console.log("Autoplay blocked, will play on first interaction");
+    musicPlaying = false;
+    musicToggle.textContent = "🔇";
+  });
+
+  musicToggle.addEventListener("click", () => {
+    if (musicPlaying) {
+      bgMusic.pause();
+      musicToggle.textContent = "🔇";
+      musicPlaying = false;
+    } else {
+      bgMusic.play().catch(e => console.log("Audio play failed:", e));
+      musicToggle.textContent = "🔊";
+      musicPlaying = true;
+    }
+  });
+
+  // Fallback: play music on first user interaction if autoplay was blocked
+  document.addEventListener("click", () => {
+    if (!musicPlaying && bgMusic.paused) {
+      bgMusic.play().catch(() => {});
+      musicToggle.textContent = "🔊";
+      musicPlaying = true;
+    }
+  }, { once: true });
+
+  // Head audio hover effects
+  const headAudios = [];
+  for (let i = 1; i <= 10; i++) {
+    headAudios.push(document.getElementById(`headAudio${i}`));
+  }
+  let currentHeadAudio = null;
+  const fireSound = document.getElementById("fireSound");
+  const ravanLaugh = document.getElementById("ravanLaugh");
+
+  function stopCurrentHeadAudio() {
+    if (currentHeadAudio) {
+      currentHeadAudio.pause();
+      currentHeadAudio.currentTime = 0;
+      currentHeadAudio = null;
+    }
+    bgMusic.volume = originalBgVolume;
+  }
+
+  // Keep pupil movement subtle: the heads themselves never follow the pointer.
+  document.addEventListener("pointermove", (event) => {
+    const pupils = document.querySelectorAll(".pupil");
+    pupils.forEach((pupil) => {
+      // Convert each pupil's own SVG coordinates to screen coordinates, including its head scale/translation.
+      const point = pupil.ownerSVGElement.createSVGPoint();
+      point.x = Number(pupil.getAttribute("cx"));
+      point.y = Number(pupil.getAttribute("cy"));
+      const screenPoint = point.matrixTransform(pupil.getScreenCTM());
+      const dx = event.clientX - screenPoint.x, dy = event.clientY - screenPoint.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const shiftX = Math.max(-1.35, Math.min(1.35, dx / len * 1.35));
+      const shiftY = Math.max(-1.1, Math.min(1.1, dy / len * 1.1));
+      pupil.setAttribute("transform", `translate(${shiftX.toFixed(2)} ${shiftY.toFixed(2)})`);
+    });
+  });
+
+  // Occasionally change only the brows to a more angry angle.
+  setInterval(() => {
+    if (Math.random() > 0.55) return;
+    const brows = document.querySelectorAll(".brow");
+    const brow = brows[Math.floor(Math.random() * brows.length)];
+    if (!brow || brow.closest(".head")?.classList.contains("burned")) return;
+    brow.setAttribute("transform", "translate(0 -1) scale(1.02 1.2)");
+    setTimeout(() => brow.removeAttribute("transform"), 650 + Math.random() * 650);
+  }, 900);
+
+  function normalize(code) {
+    return code
+      .replace(/\/\/.*$/gm, "")
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/\s+/g, "")
+      .replace(/;+}/g, ";}")
+      .trim();
+  }
+  function openChallenge(index) {
+    if (burned.has(index) || locked) return;
+    current = index;
+    wrongAttempts = 0;
+    audioHelp.hidden = true;
+    audioPlayer.innerHTML = "";
+    stopCurrentHeadAudio();
+    const c = challenges[index];
+    document.getElementById("challengeNumber").textContent = `Head ${String(index + 1).padStart(2, "0")} / 10`;
+    document.getElementById("challengeTitle").textContent = c.title;
+    document.getElementById("challengeDesc").textContent = c.desc;
+    editor.value = c.code;
+    feedback.className = "feedback";
+    feedback.textContent = "";
+    hint.hidden = true;
+    hint.textContent = "";
+    overlay.classList.add("show");
+    setTimeout(() => editor.focus(), 50);
+  }
+  function closeChallenge() {
+    overlay.classList.remove("show");
+    current = null;
+    stopCurrentHeadAudio();
+    ravanLaugh.pause();
+    ravanLaugh.currentTime = 0;
+  }
+  function laughHead(index) {
+    const head = heads[index];
+    head.classList.remove("laugh");
+    void head.getBoundingClientRect();
+    head.classList.add("laugh");
+    setTimeout(() => head.classList.remove("laugh"), 500);
+  }
+  function updateStats() {
+    document.getElementById("burnCount").textContent = burned.size;
+    document.getElementById("solveCount").textContent = solved;
+    document.getElementById("progressFill").style.width = `${burned.size * 10}%`;
+  }
+  function confettiBurst(count=90) {
+    const colors = ["#ff672a","#ffd15d","#fff0b3","#b51c22","#fff"];
+    for (let i=0;i<count;i++) {
+      const piece = document.createElement("i");
+      piece.className = "confetti";
+      piece.style.left = Math.random()*100+"vw";
+      piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+      piece.style.animationDelay = (Math.random()*.8)+"s";
+      piece.style.animationDuration = (2.5+Math.random()*2.2)+"s";
+      piece.style.transform = `rotate(${Math.random()*180}deg)`;
+      document.body.appendChild(piece);
+      setTimeout(()=>piece.remove(),5500);
+    }
+  }
+  function burnCurrent() {
+    const index = current;
+    const head = heads[index];
+    closeChallenge();
+    locked = true;
+    // Add a flame halo around this head only, using the head's own position and scale.
+    const use = head.querySelector("use");
+    const transform = use?.getAttribute("transform") || "translate(500 150) scale(1.3)";
+    const flames = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    flames.setAttribute("class", "flame-burst");
+    flames.setAttribute("transform", transform);
+    flames.setAttribute("aria-hidden", "true");
+    flames.innerHTML = `
+      <path class="flame-outer" d="M-39 25 Q-52 5 -43 -14 Q-35 -4 -34 -22 Q-20 -9 -22 -34 Q-5 -20 -7 -48 Q8 -31 8 -53 Q24 -31 19 -17 Q36 -28 35 -7 Q48 2 39 25 L31 42 L-31 42Z"/>
+      <path class="flame-outer" d="M-30 35 Q-42 12 -29 -1 Q-26 11 -17 1 Q-9 13 -8 -7 Q5 8 9 -5 Q21 8 25 -2 Q37 14 28 35Z"/>
+      <path class="flame-inner" d="M-22 33 Q-28 14 -17 8 Q-14 19 -6 11 Q0 22 7 9 Q18 19 21 9 Q29 22 19 34Z"/>`;
+    head.appendChild(flames);
+    head.classList.add("burning");
+    setTimeout(() => {
+      head.classList.remove("burning");
+      flames.remove();
+      head.classList.add("burned");
+      burned.add(index);
+      solved++;
+      updateStats();
+      locked = false;
+      if (burned.size === 10) {
+        setTimeout(() => {
+          ravan.classList.add("all-burning");
+          confettiBurst(150);
+          setTimeout(() => {
+            victoryOverlay.classList.add("show");
+            confettiBurst(120);
+          }, 950);
+        }, 420);
+      }
+    }, 690);
+  }
+
+  heads.forEach((head) => {
+    const index = Number(head.dataset.head);
+    head.addEventListener("mouseenter", () => {
+      if (head.classList.contains("burned") || head.querySelector(".anger-face")) return;
+      const use = head.querySelector("use");
+      const anger = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      anger.setAttribute("class", "anger-face");
+      anger.setAttribute("transform", use?.getAttribute("transform") || "translate(500 150) scale(1.3)");
+      anger.setAttribute("aria-hidden", "true");
+      anger.innerHTML = `
+        <path d="M-29 3 L-7 11 M7 11 L29 3" fill="none" stroke="#5b080d" stroke-width="6.5" stroke-linecap="round"/>
+        <path d="M-28 2 L-7 10 M7 10 L28 2" fill="none" stroke="#ff3727" stroke-width="2.2" stroke-linecap="round"/>
+        <ellipse cx="-14" cy="14" rx="5.3" ry="4.2" fill="#f31e18" opacity=".8"/>
+        <ellipse cx="14" cy="14" rx="5.3" ry="4.2" fill="#f31e18" opacity=".8"/>`;
+      head.appendChild(anger);
+
+      // Play head audio and reduce background music
+      stopCurrentHeadAudio();
+      bgMusic.volume = 0.4;
+      currentHeadAudio = headAudios[index];
+      if (currentHeadAudio) {
+        currentHeadAudio.play().catch(e => console.log("Head audio play failed:", e));
+      }
+    });
+    head.addEventListener("mouseleave", () => {
+      head.querySelectorAll(".anger-face").forEach(a => a.remove());
+      stopCurrentHeadAudio();
+    });
+    head.addEventListener("click", () => openChallenge(index));
+    head.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openChallenge(index); }
+    });
+  });
+  document.getElementById("closeModal").addEventListener("click", closeChallenge);
+  overlay.addEventListener("click", e => { if (e.target === overlay) closeChallenge(); });
+  document.getElementById("showHint").addEventListener("click", () => {
+    if (current === null) return;
+    hint.textContent = "Hint: " + challenges[current].hint;
+    hint.hidden = false;
+  });
+  document.getElementById("replayAudio").addEventListener("click", loadHelpAudio);
+  document.getElementById("resetCode").addEventListener("click", () => {
+    if (current === null) return;
+    editor.value = challenges[current].code;
+    feedback.className = "feedback";
+    feedback.textContent = "";
+    hint.hidden = true;
+  });
+  document.getElementById("submitFix").addEventListener("click", () => {
+    if (current === null) return;
+    const c = challenges[current];
+    if (normalize(editor.value) === normalize(c.solution)) {
+      feedback.className = "feedback show good";
+      feedback.textContent = "Correct fix! The bug is defeated — this head is burning.";
+      fireSound.play().catch(e => console.log("Fire sound play failed:", e));
+      setTimeout(burnCurrent, 500);
+    } else {
+      wrongAttempts++;
+      feedback.className = "feedback show bad";
+      feedback.textContent = wrongAttempts >= 3
+        ? "Still not quite — let's get you a little help. Audio help is ready below."
+        : "Not quite. The bug is still alive. Recheck the code and try again.";
+      laughHead(current);
+      ravanLaugh.play().catch(e => console.log("Ravan laugh play failed:", e));
+      hint.textContent = "Hint: " + c.hint;
+      hint.hidden = false;
+      if (wrongAttempts >= 3) loadHelpAudio();
+    }
+  });
+  document.getElementById("playAgain").addEventListener("click", () => {
+    burned = new Set(); solved = 0; current = null; locked = false;
+    heads.forEach(h => { h.classList.remove("burned","burning","laugh"); h.querySelectorAll(".flame-burst,.anger-face").forEach(f => f.remove()); });
+    ravan.classList.remove("all-burning");
+    audioHelp.hidden = true;
+    audioPlayer.innerHTML = "";
+    victoryOverlay.classList.remove("show");
+    stopCurrentHeadAudio();
+    ravanLaugh.pause();
+    ravanLaugh.currentTime = 0;
+    updateStats();
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") { closeChallenge(); victoryOverlay.classList.remove("show"); }
+  });
+})();
+</script>
+</body>
+</html>
